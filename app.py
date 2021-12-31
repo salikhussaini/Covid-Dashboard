@@ -6,6 +6,7 @@ import plotly.graph_objects as go # Plotting
 import plotly.express as px
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
+import zipfile
 
 st.set_page_config(page_title="Covid Dashboard", page_icon="🐞", layout="centered")
 
@@ -34,6 +35,13 @@ def agg():
 def load_agg():
     US_diff = pd.read_csv('Data/US_diff.csv')
     State_diff = pd.read_csv('Data/State_diff.csv')
+
+    path_to_zip_file = 'Data/County_diff.zip'
+    directory_to_extract_to = 'Data/'
+
+    with zipfile.ZipFile(path_to_zip_file, 'r') as zip_ref:
+        zip_ref.extractall(directory_to_extract_to)
+        
     County_diff = pd.read_csv('Data/County_diff.csv')
 
     return(US_diff,State_diff,County_diff)
