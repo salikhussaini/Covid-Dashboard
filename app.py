@@ -34,15 +34,18 @@ def agg():
 @st.cache 
 def load_agg():
     US_diff = pd.read_csv('Data/US_diff.csv')
+    US_diff = US_diff.iloc[:,1:]  
     State_diff = pd.read_csv('Data/State_diff.csv')
+    State_diff = State_diff.iloc[:,1:]
 
     path_to_zip_file = 'Data/County_diff.zip'
     directory_to_extract_to = 'Data/'
 
     with zipfile.ZipFile(path_to_zip_file, 'r') as zip_ref:
         zip_ref.extractall(directory_to_extract_to)
-        
+
     County_diff = pd.read_csv('Data/County_diff.csv')
+    County_diff = County_diff.iloc[:,1:]
 
     return(US_diff,State_diff,County_diff)
 
@@ -50,6 +53,20 @@ df_us,df_state,df_county =  get_data()
 latest_us, latest_state, latest_county = agg() 
 df_states_list,df_counties_list =  get_list()
 US_diff,State_diff,County_diff = load_agg()
+
+
+def add_diff(US_diff,State_diff,County_diff,df_us,df_state,df_county):
+    last_day_agg = US_diff.date.max()
+    df_us_1 = df_us[df_us.date > last_day_agg]
+
+    a2 = US_diff.tail(3).append(df_us_1, ignore_index = True)
+    a2['cases_dif'] = a2.cases.diff()
+    a2['deaths_dif'] = a2.deaths.diff()
+    US_diff = US_diff.append(a2[a2.date > last_day_agg])
+    
+    return(US_diff)
+
+US_diff = add_diff(US_diff,State_diff,County_diff,df_us,df_state,df_county)
 
 st.title("🐞 Covid Dashboard!")
 Option =  st.sidebar.\
