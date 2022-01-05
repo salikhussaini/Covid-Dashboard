@@ -86,7 +86,7 @@ st.title("🐞 Covid Dashboard!")
 Option =  st.sidebar.\
     selectbox("Which Level would you want to look at?",\
         ['Global (Under Development)', 'Country', 'State',\
-            'County (Under Development)'])
+            'County'])
 
 if Option == 'Country':
     #Written Info about how many cases & deaths
@@ -203,10 +203,6 @@ if Option == 'Country':
 
             st.plotly_chart(fig3a, True)
 
-
-
-
-
 elif Option == 'State': 
     State = st.sidebar.selectbox\
         ("Choose a state", df_states_list)
@@ -307,3 +303,59 @@ elif Option == 'State':
                             title="Top 10 Counties with most New Death Cases in {}".format(State))
 
             st.plotly_chart(fig3a, True)
+
+elif Option == 'County':
+    State = st.sidebar.selectbox\
+        ("Choose a state", df_states_list)
+    counties = df_county[df_county.state == State]['county'].unique()
+    county = st.sidebar.selectbox\
+        ("Choose a county", counties)
+
+    df_a = df_county[(df_county.state == State) & (df_county.county == county)]
+    df_b = County_diff[(County_diff.state == State) & (County_diff.county == county)]
+    with st.container():
+        new_cases = df_b['cases_dif'].tail(1).values[0]
+        new_cases_5 = df_b['cases_dif'].tail(5).sum()
+        new_cases_5_mean = df_b['cases_dif'].tail(5).mean()
+
+        new_deaths = df_b['deaths_dif'].tail(1).values[0]
+        new_deaths_5 = df_b['deaths_dif'].tail(5).sum()
+        new_deaths_5_mean = df_b['deaths_dif'].tail(5).mean()
+
+        col1, col2, col3  = st.columns(3)
+        with st.container():
+            with col1:
+                st.write('New Cases in last day:\n{}'.format(new_cases))
+            with col2:
+                st.write('New Cases in 5 last days:\n{}'.format(new_cases_5))
+            with col3:
+                st.write('Mean New Cases in 5 last days:\n{}'.format(new_cases_5_mean))
+
+        col4, col5, col6 = st.columns(3)
+        with st.container():
+            with col4:
+                st.write('New Deaths in last day:\n{}'.format(new_deaths))
+            with col5:
+                st.write('New Deaths in 5 last days:\n{}'.format(new_deaths_5))
+            with col6:
+                st.write('Mean New Deaths in 5 last days:\n{}'.format(new_deaths_5_mean))
+    with st.container():
+        fig = make_subplots(rows=2, cols=1, shared_xaxes=True, subplot_titles=['Covid Cases', 'Covid Deaths'])
+        fig.add_trace(
+            go.Line(x= df_a['date'], y= df_a['cases'], name='Cases',showlegend=False)
+            ,row=1, col=1)
+        fig.add_trace(
+            go.Line(x= df_a['date'], y= df_a['deaths'], name='Deaths',showlegend=False)
+            ,row=2, col=1)
+        fig.update_layout({'title': {'text': 'Covid Cases and Deaths in {} County in {} '.format(county, State), 'x': .5, 'y': .9}})
+        st.plotly_chart(fig, True)
+    with st.container():
+        fig = make_subplots(rows=2, cols=1, shared_xaxes=True,subplot_titles=['Covid Cases', 'Covid Deaths'])
+        fig.add_trace(
+            go.Bar(x= df_b['date'], y= df_b['cases_dif'], name='Cases',showlegend=False)
+            ,row=1, col=1)
+        fig.add_trace(
+            go.Bar(x= df_b['date'], y= df_b['deaths_dif'], name='Deaths',showlegend=False)
+            ,row=2, col=1)
+        fig.update_layout({'title': {'text': 'Covid Cases and Deaths in {} County in {} '.format(county, State), 'x': .5, 'y': .9}})
+        st.plotly_chart(fig, True)
