@@ -59,7 +59,7 @@ def load_agg(US_diff,State_diff,County_diff):
 
 df_us,df_county,df_state,US_diff,County_diff,State_diff = get_data()
 latest_us, latest_state, latest_county = agg(df_us, df_state,df_county) 
-df_states_list,df_counties_list =  get_list(df_us, df_state,df_county)
+df_states_list,df_counties_list =  get_list(df_state,df_county)
 US_diff,State_diff,County_diff = load_agg(US_diff,State_diff,County_diff)
 
 def add_diff(US_diff,State_diff,County_diff,df_us,df_state,df_county):
