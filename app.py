@@ -71,7 +71,7 @@ US_diff = add_diff(US_diff,State_diff,County_diff,df_us,df_state,df_county)
 st.title("🐞 Covid Dashboard!")
 Option =  st.sidebar.\
     selectbox("How many States would you want to look at?",\
-        ['Global', 'Country', 'State','County'])
+        ['Global (Under Development)', 'Country', 'State','County'])
 
 if Option == 'Country':
     #Time-Series Graph: Covid Cases and Deaths in the US
@@ -86,19 +86,19 @@ if Option == 'Country':
 
         col1, col2, col3  = st.columns(3)
         with col1:
-            st.write('New Cases in last day: {}'.format(new_cases))
+            st.write('New Cases in last day:\n{}'.format(new_cases))
         with col2:
-            st.write('New Cases in 5 last days: {}'.format(new_cases_5))
+            st.write('New Cases in 5 last days:\n{}'.format(new_cases_5))
         with col3:
-            st.write('Mean New Cases in 5 last days: {}'.format(new_cases_5_mean))
+            st.write('Mean New Cases in 5 last days:\n{}'.format(new_cases_5_mean))
 
         col4, col5, col6 = st.columns(3)
         with col4:
-            st.write('New Deaths in last day: {}'.format(new_deaths))
+            st.write('New Deaths in last day:\n{}'.format(new_deaths))
         with col5:
-            st.write('New Deaths in 5 last days: {}'.format(new_deaths_5))
+            st.write('New Deaths in 5 last days:\n{}'.format(new_deaths_5))
         with col6:
-            st.write('MeanNew Deaths in 5 last days: {}'.format(new_deaths_5_mean))
+            st.write('Mean New Deaths in 5 last days:\n{}'.format(new_deaths_5_mean))
     with st.container():
         fig = make_subplots(rows=2, cols=1, shared_xaxes=True, subplot_titles=['Covid Cases in US', 'Covid Deaths in US'])
         fig.add_trace(
