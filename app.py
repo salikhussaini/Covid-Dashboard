@@ -63,15 +63,18 @@ df_states_list,df_counties_list =  get_list(df_state,df_county)
 US_diff,State_diff,County_diff = load_agg(US_diff,State_diff,County_diff)
 
 def add_diff(US_diff,State_diff,County_diff,df_us,df_state,df_county):
-    last_day_agg = US_diff.date.max()
-    df_us_1 = df_us[df_us.date > last_day_agg]
+    if US_diff.date.max() == df_us.date.max():
+        pass
+    else:
+        last_day_agg = US_diff.date.max()
+        df_us_1 = df_us[df_us.date > last_day_agg]
 
-    a2 = US_diff.tail(3).append(df_us_1, ignore_index = True)
-    a2['cases_dif'] = a2.cases.diff()
-    a2['deaths_dif'] = a2.deaths.diff()
-    US_diff = US_diff.append(a2[a2.date > last_day_agg])
-    
-    return(US_diff)
+        a2 = US_diff.tail(3).append(df_us_1, ignore_index = True)
+        a2['cases_dif'] = a2.cases.diff()
+        a2['deaths_dif'] = a2.deaths.diff()
+        US_diff = US_diff.append(a2[a2.date > last_day_agg])
+
+        return(US_diff)
 
 US_diff = add_diff(US_diff,State_diff,County_diff,df_us,df_state,df_county)
 
