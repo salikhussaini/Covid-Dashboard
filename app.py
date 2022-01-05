@@ -76,8 +76,6 @@ def add_diff(US_diff,State_diff,County_diff,df_us,df_state,df_county):
 
         return(US_diff)
 
-US_diff = add_diff(US_diff,State_diff,County_diff,df_us,df_state,df_county)
-
 st.title("🐞 Covid Dashboard!")
 Option =  st.sidebar.\
     selectbox("Which Level would you want to look at?",\
