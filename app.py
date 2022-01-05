@@ -154,6 +154,17 @@ if Option == 'Country':
 
             st.plotly_chart(fig2, True)
 
+    with st.container():
+        with urlopen('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json') as response:
+            counties = json.load(response)
+        
+        fig = px.choropleth(df_county, geojson=counties, locations='fips',color='unemp',
+                           color_continuous_scale="Viridis",
+                           range_color=(0, 12),
+                           scope="usa"
+                          )
+        
+        st.plotly_chart(fig, True)
 
 elif Option == 'State': 
     State = st.sidebar.selectbox\
@@ -208,15 +219,5 @@ elif Option == 'State':
             ,row=2, col=1)
         fig.update_layout({'title': {'text': 'Covid Cases and Deaths in the US', 'x': .5, 'y': .9}})
         st.plotly_chart(fig, True)
-    with st.container():
-        with urlopen('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json') as response:
-            counties = json.load(response)
-        
-        fig = px.choropleth(df_county, geojson=counties, locations='fips',color='unemp',
-                           color_continuous_scale="Viridis",
-                           range_color=(0, 12),
-                           scope="usa"
-                          )
-        
-        st.plotly_chart(fig, True)
+
 
