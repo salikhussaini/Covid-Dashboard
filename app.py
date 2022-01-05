@@ -10,50 +10,59 @@ import zipfile
 
 st.set_page_config(page_title="Covid Dashboard", page_icon="🐞", layout="centered")
 
-
+st.cache()
 def get_data():
-    a = pd.read_csv('https://raw.githubusercontent.com/nytimes/covid-19-data/master/us.csv')
-    b = pd.read_csv('https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv')
-    c = pd.read_csv('https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv')
-    c['State_County'] = c['state'] + "|" + c['county']
-    return(a,b,c)
+    path_to_zip_file = 'Data/US.zip'
+    with zipfile.ZipFile(path_to_zip_file, 'r') as zip_ref:
+        files = zip_ref.namelist()
+        files_a = []
+        for a in files:
+            df = zip_ref.open(a)
+            df = pd.read_csv(df)
+            files_a.append(df)
 
-def get_list():
+        US,US_counties,US_states = (files_a[0],files_a[1],files_a[2])
+    
+    path_to_zip_file = 'Data/US_diff.zip'
+    with zipfile.ZipFile(path_to_zip_file, 'r') as zip_ref:
+        files = zip_ref.namelist()
+        files_a = []
+        for a in files:
+            print(a)
+            df = zip_ref.open(a)
+            df = pd.read_csv(df)
+            files_a.append(df)
+
+        US_counties_diff,US_states_diff,US_diff = (files_a[0],files_a[1],files_a[2])
+
+        US_counties_diff['State_County'] = US_counties_diff['state'] + "|" + US_counties_diff['county']
+    return(US,US_counties,US_states,US_diff,US_counties_diff,US_states_diff)
+st.cache()
+def get_list(df_state,df_county):
     df_us, df_state,df_county =  get_data()
     states = df_state['state'].unique()
     counties = df_county['State_County'].unique()
     return(states,counties)
-
-def agg():
+st.cache()
+def agg(df_us, df_state,df_county):
     df_us, df_state,df_county =  get_data()
     last_day = df_us.date.max()
-    df_us = df_us[df_us['date'] == last_day]
-    df_state = df_state[df_state['date'] == last_day]
-    df_county = df_county[df_county['date'] == last_day]
-    return(df_us, df_state,df_county)
-
-def load_agg():
-    US_diff = pd.read_csv('Data/US_diff.csv')
+    df_us_1 = df_us[df_us['date'] == last_day]
+    df_state_1 = df_state[df_state['date'] == last_day]
+    df_county_1 = df_county[df_county['date'] == last_day]
+    return(df_us_1, df_state_1,df_county_1)
+st.cache()
+def load_agg(US_diff,State_diff,County_diff):
     US_diff = US_diff.iloc[:,1:]  
-    State_diff = pd.read_csv('Data/State_diff.csv')
     State_diff = State_diff.iloc[:,1:]
-
-    path_to_zip_file = 'Data/County_diff.zip'
-    directory_to_extract_to = 'Data/'
-
-    with zipfile.ZipFile(path_to_zip_file, 'r') as zip_ref:
-        zip_ref.extractall(directory_to_extract_to)
-
-    County_diff = pd.read_csv('Data/County_diff.csv')
     County_diff = County_diff.iloc[:,1:]
 
     return(US_diff,State_diff,County_diff)
 
-df_us,df_state,df_county =  get_data()
-latest_us, latest_state, latest_county = agg() 
-df_states_list,df_counties_list =  get_list()
-US_diff,State_diff,County_diff = load_agg()
-
+df_us,df_county,df_state,US_diff,County_diff,State_diff = get_data()
+latest_us, latest_state, latest_county = agg(df_us, df_state,df_county) 
+df_states_list,df_counties_list =  get_list(df_us, df_state,df_county)
+US_diff,State_diff,County_diff = load_agg(US_diff,State_diff,County_diff)
 
 def add_diff(US_diff,State_diff,County_diff,df_us,df_state,df_county):
     last_day_agg = US_diff.date.max()
@@ -70,7 +79,7 @@ US_diff = add_diff(US_diff,State_diff,County_diff,df_us,df_state,df_county)
 
 st.title("🐞 Covid Dashboard!")
 Option =  st.sidebar.\
-    selectbox("How many States would you want to look at?",\
+    selectbox("Which Level would you want to look at?",\
         ['Global (Under Development)', 'Country', 'State',\
             'County (Under Development)'])
 
@@ -142,7 +151,7 @@ if Option == 'Country':
                             title="Covid Deaths in US by State")
             fig2.update_traces(text = latest_state['state'],textinfo='text+percent',  textposition='inside')
 
-            st.plotly_chart(fig2, True)
+            st.plotly_chart(fig2, True,height=800)
 
 
 elif Option == 'State': 
