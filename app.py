@@ -22,7 +22,8 @@ def get_data():
             files_a.append(df)
 
         US,US_counties,US_states = (files_a[0],files_a[1],files_a[2])
-    
+        US_counties['State_County'] = US_counties['state'] + "|" + US_counties['county']
+        
     path_to_zip_file = 'Data/US_diff.zip'
     with zipfile.ZipFile(path_to_zip_file, 'r') as zip_ref:
         files = zip_ref.namelist()
@@ -35,7 +36,6 @@ def get_data():
 
         US_counties_diff,US_states_diff,US_diff = (files_a[0],files_a[1],files_a[2])
 
-        US_counties_diff['State_County'] = US_counties_diff['state'] + "|" + US_counties_diff['county']
     return(US,US_counties,US_states,US_diff,US_counties_diff,US_states_diff)
 st.cache()
 def get_list(df_state,df_county):
