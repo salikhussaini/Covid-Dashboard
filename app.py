@@ -39,13 +39,11 @@ def get_data():
     return(US,US_counties,US_states,US_diff,US_counties_diff,US_states_diff)
 st.cache()
 def get_list(df_state,df_county):
-    df_us, df_state,df_county =  get_data()
     states = df_state['state'].unique()
     counties = df_county['State_County'].unique()
     return(states,counties)
 st.cache()
 def agg(df_us, df_state,df_county):
-    df_us, df_state,df_county =  get_data()
     last_day = df_us.date.max()
     df_us_1 = df_us[df_us['date'] == last_day]
     df_state_1 = df_state[df_state['date'] == last_day]
