@@ -10,20 +10,20 @@ import zipfile
 
 st.set_page_config(page_title="Covid Dashboard", page_icon="🐞", layout="centered")
 
-@st.cache 
+
 def get_data():
     a = pd.read_csv('https://raw.githubusercontent.com/nytimes/covid-19-data/master/us.csv')
     b = pd.read_csv('https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv')
     c = pd.read_csv('https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv')
     c['State_County'] = c['state'] + "|" + c['county']
     return(a,b,c)
-@st.cache 
+
 def get_list():
     df_us, df_state,df_county =  get_data()
     states = df_state['state'].unique()
     counties = df_county['State_County'].unique()
     return(states,counties)
-@st.cache 
+
 def agg():
     df_us, df_state,df_county =  get_data()
     last_day = df_us.date.max()
@@ -31,7 +31,7 @@ def agg():
     df_state = df_state[df_state['date'] == last_day]
     df_county = df_county[df_county['date'] == last_day]
     return(df_us, df_state,df_county)
-@st.cache 
+
 def load_agg():
     US_diff = pd.read_csv('Data/US_diff.csv')
     US_diff = US_diff.iloc[:,1:]  
@@ -71,10 +71,11 @@ US_diff = add_diff(US_diff,State_diff,County_diff,df_us,df_state,df_county)
 st.title("🐞 Covid Dashboard!")
 Option =  st.sidebar.\
     selectbox("How many States would you want to look at?",\
-        ['Global (Under Development)', 'Country', 'State','County'])
+        ['Global (Under Development)', 'Country', 'State',\
+            'County (Under Development)'])
 
 if Option == 'Country':
-    #Time-Series Graph: Covid Cases and Deaths in the US
+    #Written Info about how many cases & deaths
     with st.container():
         new_cases = US_diff['cases_dif'].tail(1).values[0]
         new_cases_5 = US_diff['cases_dif'].tail(5).sum()
@@ -99,6 +100,7 @@ if Option == 'Country':
             st.write('New Deaths in 5 last days:\n{}'.format(new_deaths_5))
         with col6:
             st.write('Mean New Deaths in 5 last days:\n{}'.format(new_deaths_5_mean))
+    #Time-Series Graph: Covid Cases and Deaths in the US
     with st.container():
         fig = make_subplots(rows=2, cols=1, shared_xaxes=True, subplot_titles=['Covid Cases in US', 'Covid Deaths in US'])
         fig.add_trace(
@@ -120,6 +122,7 @@ if Option == 'Country':
             ,row=2, col=1)
         fig.update_layout({'title': {'text': 'Covid Cases and Deaths in the US', 'x': .5, 'y': .9}})
         st.plotly_chart(fig, True)
+    #PieChart: Covid Cases and Deaths in the US
     with st.container():
         col1, col2 = st.columns(2)
         with col1:
@@ -148,6 +151,33 @@ elif Option == 'State':
 
     df = df_state[df_state.state == State]
     state_diff_1 = State_diff[State_diff.state == State]
+        #Written Info about how many cases & deaths
+    with st.container():
+        new_cases = state_diff_1['cases_dif'].tail(1).values[0]
+        new_cases_5 = state_diff_1['cases_dif'].tail(5).sum()
+        new_cases_5_mean = state_diff_1['cases_dif'].tail(5).mean()
+
+        new_deaths = state_diff_1['deaths_dif'].tail(1).values[0]
+        new_deaths_5 = state_diff_1['deaths_dif'].tail(5).sum()
+        new_deaths_5_mean = state_diff_1['deaths_dif'].tail(5).mean()
+
+        col1, col2, col3  = st.columns(3)
+        with st.container():
+            with col1:
+                st.write('New Cases in last day:\n{}'.format(new_cases))
+            with col2:
+                st.write('New Cases in 5 last days:\n{}'.format(new_cases_5))
+            with col3:
+                st.write('Mean New Cases in 5 last days:\n{}'.format(new_cases_5_mean))
+
+        col4, col5, col6 = st.columns(3)
+        with st.container():
+            with col4:
+                st.write('New Deaths in last day:\n{}'.format(new_deaths))
+            with col5:
+                st.write('New Deaths in 5 last days:\n{}'.format(new_deaths_5))
+            with col6:
+                st.write('Mean New Deaths in 5 last days:\n{}'.format(new_deaths_5_mean))
 
     with st.container():
         fig = make_subplots(rows=2, cols=1, shared_xaxes=True, subplot_titles=['Covid Cases in US', 'Covid Deaths in US'])
@@ -159,7 +189,6 @@ elif Option == 'State':
             ,row=2, col=1)
         fig.update_layout({'title': {'text': 'Covid Cases and Deaths in the US', 'x': .5, 'y': .9}})
         st.plotly_chart(fig, True)
-    
     with st.container():
         fig = make_subplots(rows=2, cols=1, shared_xaxes=True,subplot_titles=['Covid Cases in US', 'Covid Deaths in US'])
         fig.add_trace(
