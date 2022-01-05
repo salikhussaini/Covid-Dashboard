@@ -76,9 +76,13 @@ Option =  st.sidebar.\
 if Option == 'Country':
     #Time-Series Graph: Covid Cases and Deaths in the US
     with st.container():
+        new_cases = US_diff['cases_dif'].tail(1).values[0]
+        new_cases_5 = US_diff['cases_dif'].tail(5).sum()
         col1, col2 = st.columns(2)
         with col1:
-            st.write('New Cases in last day: {}'.format(US_diff['cases_dif'].tail(1)))
+            st.write('New Cases in last day: {}'.format(new_cases))
+        with col2:
+            st.write('New Cases in last day: {}'.format(new_cases_5))
     with st.container():
         fig = make_subplots(rows=2, cols=1, shared_xaxes=True, subplot_titles=['Covid Cases in US', 'Covid Deaths in US'])
         fig.add_trace(
