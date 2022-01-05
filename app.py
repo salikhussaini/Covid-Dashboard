@@ -78,7 +78,7 @@ if Option == 'Country':
     with st.container():
         col1, col2 = st.columns(2)
         with col1:
-            st.write('New Cases in last day: {}'.format(US_diff['cases_dif'].tail()[0]))
+            st.write('New Cases in last day: {}'.format(US_diff['cases_dif'].tail(1)))
     with st.container():
         fig = make_subplots(rows=2, cols=1, shared_xaxes=True, subplot_titles=['Covid Cases in US', 'Covid Deaths in US'])
         fig.add_trace(
