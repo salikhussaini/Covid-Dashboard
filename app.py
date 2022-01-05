@@ -241,24 +241,69 @@ elif Option == 'State':
             with col6:
                 st.write('Mean New Deaths in 5 last days:\n{}'.format(new_deaths_5_mean))
     with st.container():
-        fig = make_subplots(rows=2, cols=1, shared_xaxes=True, subplot_titles=['Covid Cases in US', 'Covid Deaths in US'])
+        fig = make_subplots(rows=2, cols=1, shared_xaxes=True, subplot_titles=['Covid Cases', 'Covid Deaths'])
         fig.add_trace(
             go.Line(x= df['date'], y= df['cases'], name='Cases',showlegend=False)
             ,row=1, col=1)
         fig.add_trace(
             go.Line(x= df['date'], y= df['deaths'], name='Deaths',showlegend=False)
             ,row=2, col=1)
-        fig.update_layout({'title': {'text': 'Covid Cases and Deaths in the US', 'x': .5, 'y': .9}})
+        fig.update_layout({'title': {'text': 'Covid Cases and Deaths in  {}'.format(State), 'x': .5, 'y': .9}})
         st.plotly_chart(fig, True)
     with st.container():
-        fig = make_subplots(rows=2, cols=1, shared_xaxes=True,subplot_titles=['Covid Cases in US', 'Covid Deaths in US'])
+        fig = make_subplots(rows=2, cols=1, shared_xaxes=True,subplot_titles=['Covid Cases', 'Covid Deaths'])
         fig.add_trace(
             go.Bar(x= state_diff_1['date'], y= state_diff_1['cases_dif'], name='Cases',showlegend=False)
             ,row=1, col=1)
         fig.add_trace(
             go.Bar(x= state_diff_1['date'], y= state_diff_1['deaths_dif'], name='Deaths',showlegend=False)
             ,row=2, col=1)
-        fig.update_layout({'title': {'text': 'Covid Cases and Deaths in the US', 'x': .5, 'y': .9}})
+        fig.update_layout({'title': {'text': 'Covid Cases and Deaths in  {}'.format(State), 'x': .5, 'y': .9}})
         st.plotly_chart(fig, True)
+    with st.container():
+        latest_county = latest_county[latest_county['state'] == State]
+        col1, col2 = st.columns(2)
+        death_10 = latest_county.sort_values('deaths',ascending=False)[['county','deaths']].head(10)
+        cases_10 = latest_county.sort_values('cases',ascending=False)[['county','cases']].head(10)
 
+        with col1:
+            fig1 = px.bar(cases_10 ,\
+                x = 'county', y = 'cases',\
+                    hover_name="county",\
+                        hover_data=["cases"],\
+                            title="Top 10 Counties with most Covid Cases in {}".format(State))
+            st.plotly_chart(fig1, True)
+        with col2:
+            fig2 = px.bar(death_10 ,\
+                x = 'county', y = 'deaths',\
+                    hover_name="county",\
+                        hover_data=["deaths"],\
+                            title="Top 10 Counties with most Death Cases in {}".format(State))
 
+            st.plotly_chart(fig2, True)
+    #BarChart: Top 10 States New Covid Cases and Deaths in the US
+    with st.container():
+        County_diff = County_diff[County_diff['state'] == State]
+        
+        col3, col4 = st.columns(2)
+        last_day_agg = County_diff.date.max()
+
+        t_df = County_diff[County_diff['date'] == last_day_agg]
+        t_death_10 = t_df.sort_values('deaths_dif',ascending=False)[['county','deaths_dif']].head(10)
+        t_cases_10 = t_df.sort_values('cases_dif',ascending=False)[['county','cases_dif']].head(10)
+
+        with col3:
+            fig2a = px.bar(t_cases_10 ,\
+                x = 'county', y = 'cases_dif',\
+                    hover_name="county",\
+                        hover_data=["cases_dif"],\
+                            title="Top 10 Counties with New Covid Cases in {}".format(State))
+            st.plotly_chart(fig2a, True)
+        with col4:
+            fig3a = px.bar(t_death_10 ,\
+                x = 'county', y = 'deaths_dif',\
+                    hover_name="county",\
+                        hover_data=["deaths_dif"],\
+                            title="Top 10 Counties with most New Death Cases in {}".format(State))
+
+            st.plotly_chart(fig3a, True)
