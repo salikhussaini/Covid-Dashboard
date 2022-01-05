@@ -29,7 +29,6 @@ def get_data():
         files = zip_ref.namelist()
         files_a = []
         for a in files:
-            print(a)
             df = zip_ref.open(a)
             df = pd.read_csv(df)
             files_a.append(df)
@@ -150,7 +149,7 @@ if Option == 'Country':
                             title="Covid Deaths in US by State")
             fig2.update_traces(text = latest_state['state'],textinfo='text+percent',  textposition='inside')
 
-            st.plotly_chart(fig2, True,height=800)
+            st.plotly_chart(fig2, True)
 
 
 elif Option == 'State': 
@@ -186,7 +185,6 @@ elif Option == 'State':
                 st.write('New Deaths in 5 last days:\n{}'.format(new_deaths_5))
             with col6:
                 st.write('Mean New Deaths in 5 last days:\n{}'.format(new_deaths_5_mean))
-
     with st.container():
         fig = make_subplots(rows=2, cols=1, shared_xaxes=True, subplot_titles=['Covid Cases in US', 'Covid Deaths in US'])
         fig.add_trace(
