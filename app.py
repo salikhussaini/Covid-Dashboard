@@ -70,9 +70,15 @@ US_diff = add_diff(US_diff,State_diff,County_diff,df_us,df_state,df_county)
 
 st.title("🐞 Covid Dashboard!")
 Option =  st.sidebar.\
-    selectbox("How many States would you want to look at?", ['All', 'Some', 'One'])
+    selectbox("How many States would you want to look at?",\
+        ['Global', 'Country', 'State','County'])
 
-if Option == 'All':
+if Option == 'Country':
+    #Time-Series Graph: Covid Cases and Deaths in the US
+    with st.container():
+        col1, col2 = st.columns(2)
+        with col1:
+            st.write('New Cases in last day: {}'.format(US_diff['cases_dif'][-1]))
     with st.container():
         fig = make_subplots(rows=2, cols=1, shared_xaxes=True, subplot_titles=['Covid Cases in US', 'Covid Deaths in US'])
         fig.add_trace(
@@ -83,6 +89,7 @@ if Option == 'All':
             ,row=2, col=1)
         fig.update_layout({'title': {'text': 'Covid Cases and Deaths in the US', 'x': .5, 'y': .9}})
         st.plotly_chart(fig, True)
+    #Histogrm: Covid Cases and Deaths in the US
     with st.container():
         fig = make_subplots(rows=2, cols=1, shared_xaxes=True, subplot_titles=['Covid Cases in US', 'Covid Deaths in US'])
         fig.add_trace(
@@ -114,22 +121,8 @@ if Option == 'All':
 
             st.plotly_chart(fig2, True)
 
-elif Option == 'Some': 
-    States = st.sidebar.multiselect\
-        ("Choose a state or states", df_states_list)
-    with st.container():
-        df = df_state[df_state.state.isin(States)]
 
-        fig1 = px.line(df, x="date", y="cases", color='state')
-        fig1.update_layout({'title': {'text': 'Covid Cases in the US by State', 'x': .5, 'y': .9}})
-        st.plotly_chart(fig1, True)
-
-        fig2 = px.line(df, x="date", y="deaths", color='state')
-        fig2.update_layout({'title': {'text': 'Covid Deaths in the US by State', 'x': .5, 'y': .9}})
-        st.plotly_chart(fig2, True)
-
-
-if Option == 'One': 
+elif Option == 'State': 
     State = st.sidebar.selectbox\
         ("Choose a state", df_states_list)
 
