@@ -1,3 +1,4 @@
+from datetime import datetime
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -46,6 +47,9 @@ def get_list(df_state,df_county):
     return(states,counties)
 st.cache()
 def agg(df_us, df_state,df_county):
+    df_us['date'] = pd.to_datetime(df_us['date'])
+    df_state['date'] = pd.to_datetime(df_state['date'])
+    df_county['date'] = pd.to_datetime(df_county['date'])
     last_day = df_us.date.max()
     df_us_1 = df_us[df_us['date'] == last_day]
     df_state_1 = df_state[df_state['date'] == last_day]
@@ -153,6 +157,54 @@ if Option == 'Country':
             fig2.update_traces(text = latest_state['state'],textinfo='text+percent',  textposition='inside')
 
             st.plotly_chart(fig2, True)
+    #BarChart: Top 10 States Covid Cases and Deaths in the US
+    with st.container():
+        col1, col2 = st.columns(2)
+        death_10 = latest_state.sort_values('deaths',ascending=False)[['state','deaths']].head(10)
+        cases_10 = latest_state.sort_values('cases',ascending=False)[['state','cases']].head(10)
+
+        with col1:
+            fig1 = px.bar(cases_10 ,\
+                x = 'state', y = 'cases',\
+                    hover_name="state",\
+                        hover_data=["cases"],\
+                            title="Top 10 States with most Covid Cases in US")
+            st.plotly_chart(fig1, True)
+        with col2:
+            fig2 = px.bar(death_10 ,\
+                x = 'state', y = 'deaths',\
+                    hover_name="state",\
+                        hover_data=["deaths"],\
+                            title="Top 10 States with most Death Cases in US")
+
+            st.plotly_chart(fig2, True)
+    #BarChart: Top 10 States New Covid Cases and Deaths in the US
+    with st.container():
+        col3, col4 = st.columns(2)
+        last_day_agg = State_diff.date.max()
+
+        t_df = State_diff[State_diff['date'] == last_day_agg]
+        t_death_10 = t_df.sort_values('deaths_dif',ascending=False)[['state','deaths_dif']].head(10)
+        t_cases_10 = t_df.sort_values('cases_dif',ascending=False)[['state','cases_dif']].head(10)
+
+        with col3:
+            fig2a = px.bar(t_cases_10 ,\
+                x = 'state', y = 'cases_dif',\
+                    hover_name="state",\
+                        hover_data=["cases_dif"],\
+                            title="Top 10 States with most New Covid Cases in US")
+            st.plotly_chart(fig2a, True)
+        with col4:
+            fig3a = px.bar(t_death_10 ,\
+                x = 'state', y = 'deaths_dif',\
+                    hover_name="state",\
+                        hover_data=["deaths_dif"],\
+                            title="Top 10 States with most New Death Cases in US")
+
+            st.plotly_chart(fig3a, True)
+
+
+
 
 
 elif Option == 'State': 
