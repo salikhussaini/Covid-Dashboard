@@ -78,11 +78,27 @@ if Option == 'Country':
     with st.container():
         new_cases = US_diff['cases_dif'].tail(1).values[0]
         new_cases_5 = US_diff['cases_dif'].tail(5).sum()
-        col1, col2 = st.columns(2)
+        new_cases_5_mean = US_diff['cases_dif'].tail(5).mean()
+
+        new_deaths = US_diff['deaths_dif'].tail(1).values[0]
+        new_deaths_5 = US_diff['deaths_dif'].tail(5).sum()
+        new_deaths_5_mean = US_diff['deaths_dif'].tail(5).mean()
+
+        col1, col2, col3  = st.columns(3)
         with col1:
             st.write('New Cases in last day: {}'.format(new_cases))
         with col2:
-            st.write('New Cases in last day: {}'.format(new_cases_5))
+            st.write('New Cases in 5 last days: {}'.format(new_cases_5))
+        with col3:
+            st.write('Mean New Cases in 5 last days: {}'.format(new_cases_5_mean))
+
+        col4, col5, col6 = st.columns(3)
+        with col4:
+            st.write('New Deaths in last day: {}'.format(new_deaths))
+        with col5:
+            st.write('New Deaths in 5 last days: {}'.format(new_deaths_5))
+        with col6:
+            st.write('MeanNew Deaths in 5 last days: {}'.format(new_deaths_5_mean))
     with st.container():
         fig = make_subplots(rows=2, cols=1, shared_xaxes=True, subplot_titles=['Covid Cases in US', 'Covid Deaths in US'])
         fig.add_trace(
